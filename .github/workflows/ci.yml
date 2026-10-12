@@ -31,7 +31,7 @@ jobs:
           xcodebuild build \
             -project HueHunt/HueHunt.xcodeproj \
             -scheme HueHunt \
-            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -destination 'generic/platform=iOS Simulator' \
             -resultBundlePath TestResults.xcresult
 
       - name: Upload build results
