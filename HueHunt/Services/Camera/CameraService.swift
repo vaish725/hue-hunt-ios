@@ -1,5 +1,7 @@
 import AVFoundation
 import Accelerate
+import CoreImage
+import ImageIO
 
 // A downsampled camera frame in sRGB, ready for palette extraction.
 struct PixelSample: Sendable {
@@ -17,6 +19,7 @@ final class CameraService: NSObject, @unchecked Sendable {
   private let videoOutput = AVCaptureVideoDataOutput()
   private let minimumFrameInterval: TimeInterval = 0.2
   private var lastFrameDate = Date.distantPast
+  private var latestPixelBuffer: CVPixelBuffer?
   private var continuation: AsyncStream<PixelSample>.Continuation?
 
   private(set) lazy var previewLayer = AVCaptureVideoPreviewLayer(session: session)
@@ -37,6 +40,22 @@ final class CameraService: NSObject, @unchecked Sendable {
   func stop() {
     sessionQueue.async { [weak self] in
       self?.session.stopRunning()
+    }
+  }
+
+  // Renders the most recent frame as a JPEG thumbnail scaled so its longest side is
+  // maxDimension. Runs on the same queue that writes latestPixelBuffer, so no lock is needed.
+  func captureThumbnail(maxDimension: Int = 512, quality: CGFloat = 0.7) async -> Data? {
+    await withCheckedContinuation { continuation in
+      frameQueue.async { [weak self] in
+        guard let pixelBuffer = self?.latestPixelBuffer else {
+          continuation.resume(returning: nil)
+          return
+        }
+        let data = Self.makeThumbnailJPEG(
+          from: pixelBuffer, maxDimension: maxDimension, quality: quality)
+        continuation.resume(returning: data)
+      }
     }
   }
 
@@ -67,6 +86,26 @@ final class CameraService: NSObject, @unchecked Sendable {
 
     session.commitConfiguration()
   }
+
+  private static func makeThumbnailJPEG(
+    from pixelBuffer: CVPixelBuffer, maxDimension: Int, quality: CGFloat
+  ) -> Data? {
+    let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+    let extent = ciImage.extent
+    let longestSide = max(extent.width, extent.height)
+    guard longestSide > 0 else { return nil }
+    let scale = CGFloat(maxDimension) / longestSide
+    let scaledImage = ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+
+    guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
+    let qualityOption = CIImageRepresentationOption(
+      rawValue: kCGImageDestinationLossyCompressionQuality as String)
+    return CIContext().jpegRepresentation(
+      of: scaledImage,
+      colorSpace: colorSpace,
+      options: [qualityOption: quality]
+    )
+  }
 }
 
 extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
@@ -75,15 +114,14 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     didOutput sampleBuffer: CMSampleBuffer,
     from connection: AVCaptureConnection
   ) {
+    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+    latestPixelBuffer = pixelBuffer
+
     let now = Date()
     guard now.timeIntervalSince(lastFrameDate) >= minimumFrameInterval else { return }
     lastFrameDate = now
 
-    guard
-      let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
-      let pixels = Self.downsample(pixelBuffer)
-    else { return }
-
+    guard let pixels = Self.downsample(pixelBuffer) else { return }
     continuation?.yield(PixelSample(pixels: pixels))
   }
 

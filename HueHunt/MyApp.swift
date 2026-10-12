@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 @main struct MyApp: App {
@@ -5,5 +6,6 @@ import SwiftUI
     WindowGroup {
       CaptureView()
     }
+    .modelContainer(for: Palette.self)
   }
 }
