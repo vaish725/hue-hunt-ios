@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26"
+
+      - name: Lint formatting
+        run: swift format lint --strict --recursive .
+
+      - name: Test PaletteEngine package
+        run: swift test --package-path Packages/PaletteEngine
+
+      - name: Test HueHunt app
+        run: |
+          xcodebuild test \
+            -project HueHunt/HueHunt.xcodeproj \
+            -scheme HueHunt \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -resultBundlePath TestResults.xcresult
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.xcresult
