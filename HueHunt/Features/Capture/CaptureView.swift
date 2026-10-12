@@ -33,22 +33,6 @@ struct CaptureView: View {
   }
 }
 
-// Minimal 5-swatch strip proving the pipeline works end to end.
-// Weight-proportional widths and the full catch animation are separate, later UI work.
-private struct PaletteStrip: View {
-  let colors: [PaletteColor]
-
-  var body: some View {
-    HStack(spacing: 4) {
-      ForEach(colors, id: \.hex) { color in
-        RoundedRectangle(cornerRadius: 12)
-          .fill(Color(paletteHex: color.hex))
-      }
-    }
-    .frame(height: 48)
-  }
-}
-
 private struct ShutterButton: View {
   let action: () -> Void
 
@@ -67,10 +51,6 @@ private struct ShutterButton: View {
 private struct CaughtPaletteSheet: View {
   let palette: Palette
 
-  private var colors: [PaletteColor] {
-    (try? JSONDecoder().decode([PaletteColor].self, from: palette.colorsData)) ?? []
-  }
-
   var body: some View {
     VStack(spacing: 16) {
       if let thumbnail = palette.thumbnail, let cgImage = makeCGImage(from: thumbnail) {
@@ -83,7 +63,7 @@ private struct CaughtPaletteSheet: View {
       Text(palette.name)
         .font(.headline)
 
-      ForEach(colors, id: \.hex) { color in
+      ForEach(palette.decodedColors, id: \.hex) { color in
         HStack {
           RoundedRectangle(cornerRadius: 8)
             .fill(Color(paletteHex: color.hex))
@@ -101,17 +81,5 @@ private struct CaughtPaletteSheet: View {
   private func makeCGImage(from data: Data) -> CGImage? {
     guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
     return CGImageSourceCreateImageAtIndex(source, 0, nil)
-  }
-}
-
-extension Color {
-  init(paletteHex hex: String) {
-    var sanitized = hex
-    if sanitized.hasPrefix("#") { sanitized.removeFirst() }
-    let value = UInt64(sanitized, radix: 16) ?? 0
-    let red = Double((value >> 16) & 0xFF) / 255
-    let green = Double((value >> 8) & 0xFF) / 255
-    let blue = Double(value & 0xFF) / 255
-    self.init(red: red, green: green, blue: blue)
   }
 }
