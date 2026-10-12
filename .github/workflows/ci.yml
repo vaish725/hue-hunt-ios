@@ -25,15 +25,16 @@ jobs:
       - name: Test PaletteEngine package
         run: swift test --package-path Packages/PaletteEngine
 
-      - name: Test HueHunt app
+      # Switches to `xcodebuild test` once a real HueHuntTests target exists.
+      - name: Build HueHunt app
         run: |
-          xcodebuild test \
+          xcodebuild build \
             -project HueHunt/HueHunt.xcodeproj \
             -scheme HueHunt \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
             -resultBundlePath TestResults.xcresult
 
-      - name: Upload test results
+      - name: Upload build results
         if: always()
         uses: actions/upload-artifact@v4
         with:
