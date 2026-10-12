@@ -1,0 +1,23 @@
+# Internal planning docs, never pushed
+prd.md
+ui-ideas/
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+.build/
+*.moved-aside
+*.xcuserdatad
+
+# Swift Package Manager
+.swiftpm/
+Packages/*/Package.resolved
+
+# Secrets
+Config/Secrets.xcconfig
+
+# macOS
+.DS_Store
