@@ -10,11 +10,14 @@ import SwiftUI
   }
 }
 
-// Only Capture and Library exist so far. Today and Profile are added once
-// their features (daily prompt, friends, settings) are built.
 private struct RootTabView: View {
   var body: some View {
     TabView {
+      NavigationStack {
+        TodayView()
+      }
+      .tabItem { Label("Today", systemImage: "sun.max.fill") }
+
       CaptureView()
         .tabItem { Label("Capture", systemImage: "camera.fill") }
 
@@ -22,6 +25,11 @@ private struct RootTabView: View {
         LibraryView()
       }
       .tabItem { Label("Library", systemImage: "square.grid.2x2.fill") }
+
+      NavigationStack {
+        ProfileView()
+      }
+      .tabItem { Label("Profile", systemImage: "person.fill") }
     }
   }
 }

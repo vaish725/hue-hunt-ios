@@ -1,5 +1,3 @@
-import CoreGraphics
-import ImageIO
 import PaletteEngine
 import SwiftData
 import SwiftUI
@@ -26,7 +24,9 @@ struct CaptureView: View {
       }
       .sensoryFeedback(.impact(weight: .medium), trigger: catchCount)
       .sheet(item: $caughtPalette) { palette in
-        CaughtPaletteSheet(palette: palette)
+        NavigationStack {
+          PaletteDetailView(palette: palette)
+        }
       }
       .onAppear { viewModel.start() }
       .onDisappear { viewModel.stop() }
@@ -43,43 +43,5 @@ private struct ShutterButton: View {
         .frame(width: 72, height: 72)
         .background(Circle().fill(.white.opacity(0.3)))
     }
-  }
-}
-
-// Stands in for the full Palette Detail screen (share card, contrast pairs, rename)
-// until that feature is built. Just confirms a catch was saved with its colors.
-private struct CaughtPaletteSheet: View {
-  let palette: Palette
-
-  var body: some View {
-    VStack(spacing: 16) {
-      if let thumbnail = palette.thumbnail, let cgImage = makeCGImage(from: thumbnail) {
-        Image(cgImage, scale: 1, label: Text(palette.name))
-          .resizable()
-          .scaledToFit()
-          .clipShape(RoundedRectangle(cornerRadius: 16))
-      }
-
-      Text(palette.name)
-        .font(.headline)
-
-      ForEach(palette.decodedColors, id: \.hex) { color in
-        HStack {
-          RoundedRectangle(cornerRadius: 8)
-            .fill(Color(paletteHex: color.hex))
-            .frame(width: 32, height: 32)
-          Text(color.hex)
-          Spacer()
-          Text(color.name)
-            .foregroundStyle(.secondary)
-        }
-      }
-    }
-    .padding()
-  }
-
-  private func makeCGImage(from data: Data) -> CGImage? {
-    guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
-    return CGImageSourceCreateImageAtIndex(source, 0, nil)
   }
 }

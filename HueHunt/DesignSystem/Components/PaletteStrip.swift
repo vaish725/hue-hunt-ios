@@ -2,17 +2,22 @@ import Foundation
 import PaletteEngine
 import SwiftUI
 
-// A horizontal strip of equal-width swatches, shared by the live Capture preview,
-// the catch confirmation, and the Library grid. Weight-proportional widths are
-// separate, later UI work.
+// A horizontal strip of swatches sized by each color's share of the image, shared by the
+// live Capture preview, the catch confirmation, and the Library grid.
 struct PaletteStrip: View {
   let colors: [PaletteColor]
 
+  private let spacing: CGFloat = 4
+
   var body: some View {
-    HStack(spacing: 4) {
-      ForEach(colors, id: \.hex) { color in
-        RoundedRectangle(cornerRadius: 12)
-          .fill(Color(paletteHex: color.hex))
+    GeometryReader { geometry in
+      let availableWidth = max(geometry.size.width - spacing * CGFloat(max(colors.count - 1, 0)), 0)
+      HStack(spacing: spacing) {
+        ForEach(colors, id: \.hex) { color in
+          RoundedRectangle(cornerRadius: 12)
+            .fill(Color(paletteHex: color.hex))
+            .frame(width: availableWidth * CGFloat(color.weight))
+        }
       }
     }
     .frame(height: 48)
@@ -37,4 +42,15 @@ extension Palette {
   var decodedColors: [PaletteColor] {
     (try? JSONDecoder().decode([PaletteColor].self, from: colorsData)) ?? []
   }
+}
+
+#Preview {
+  let weighted: [(String, Float)] = [
+    ("#FF6B6B", 0.45), ("#4ECDC4", 0.25), ("#FFD93D", 0.15), ("#1A535C", 0.10), ("#F7FFF7", 0.05),
+  ]
+  let colors = weighted.map { hex, weight in
+    PaletteColor(hex: hex, lab: SIMD3(0, 0, 0), weight: weight, name: hex)
+  }
+  return PaletteStrip(colors: colors)
+    .padding()
 }
