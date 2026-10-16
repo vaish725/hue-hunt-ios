@@ -1,0 +1,10 @@
+// Base configuration for Release builds. Assign this in Xcode: select the project file, the
+// Info tab, and set it as the "Based on Configuration File" for Release (per target or at the
+// project level, matching how Debug.xcconfig is assigned).
+#include? "Secrets.xcconfig"
+
+INFOPLIST_KEY_SUPABASE_URL = $(SUPABASE_URL)
+INFOPLIST_KEY_SUPABASE_ANON_KEY = $(SUPABASE_ANON_KEY)
+
+// PRD 15.1: CI and Release both fail the build on any compiler warning.
+SWIFT_TREAT_WARNINGS_AS_ERRORS = YES

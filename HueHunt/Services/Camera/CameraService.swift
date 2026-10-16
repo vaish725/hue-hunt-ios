@@ -24,6 +24,14 @@ final class CameraService: NSObject, @unchecked Sendable {
 
   private(set) lazy var previewLayer = AVCaptureVideoPreviewLayer(session: session)
 
+  static var authorizationStatus: AVAuthorizationStatus {
+    AVCaptureDevice.authorizationStatus(for: .video)
+  }
+
+  static func requestAccess() async -> Bool {
+    await AVCaptureDevice.requestAccess(for: .video)
+  }
+
   func makeFrameStream() -> AsyncStream<PixelSample> {
     AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
       self.continuation = continuation

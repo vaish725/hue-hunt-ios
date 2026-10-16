@@ -10,6 +10,7 @@ final class Palette: Identifiable {
   var colorsData: Data
   @Attribute(.externalStorage) var thumbnail: Data?
   var createdAt: Date
+  @Relationship(inverse: \Board.palettes) var boards: [Board] = []
 
   init(
     id: UUID = UUID(), name: String, colorsData: Data, thumbnail: Data?,

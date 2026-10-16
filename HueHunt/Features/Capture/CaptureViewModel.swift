@@ -7,6 +7,7 @@ import SwiftData
 @MainActor
 final class CaptureViewModel {
   private(set) var palette = ExtractedPalette(colors: [])
+  private(set) var isCameraAccessDenied = false
 
   private let cameraService = CameraService()
   private let paletteExtractor = PaletteExtractor()
@@ -14,6 +15,23 @@ final class CaptureViewModel {
 
   var previewLayer: AVCaptureVideoPreviewLayer {
     cameraService.previewLayer
+  }
+
+  // Checks camera authorization before starting the session, prompting the system dialog only
+  // when the user has never been asked. A denied or restricted status shows an empty state
+  // instead of a blank preview (PRD F1 AC2).
+  func prepareAndStart() async {
+    switch CameraService.authorizationStatus {
+    case .authorized:
+      isCameraAccessDenied = false
+      start()
+    case .notDetermined:
+      let granted = await CameraService.requestAccess()
+      isCameraAccessDenied = !granted
+      if granted { start() }
+    default:
+      isCameraAccessDenied = true
+    }
   }
 
   func start() {

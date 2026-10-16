@@ -3,6 +3,7 @@ import ImageIO
 import PaletteEngine
 import SwiftData
 import SwiftUI
+import UIKit
 
 // Full-screen view for a single caught palette: rename, per-color breakdown, contrast pairs
 // against each other (via PaletteEngine's Contrast), and a shareable card image. Reached from
@@ -10,7 +11,14 @@ import SwiftUI
 struct PaletteDetailView: View {
   @Bindable var palette: Palette
   @Environment(\.displayScale) private var displayScale
+  @Environment(\.modelContext) private var modelContext
+  @Environment(\.dismiss) private var dismiss
+  @Query(sort: \Board.createdAt, order: .reverse) private var boards: [Board]
   @State private var shareImage: Image?
+  @State private var showingDeleteConfirmation = false
+  @State private var showingNewBoardPrompt = false
+  @State private var newBoardName = ""
+  @State private var didCopy = false
 
   private var colors: [PaletteColor] { palette.decodedColors }
 
@@ -41,8 +49,82 @@ struct PaletteDetailView: View {
           ShareLink(item: shareImage, preview: SharePreview(palette.name, image: shareImage))
         }
       }
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          Button {
+            copyAllHexValues()
+          } label: {
+            Label("Copy All Hex Values", systemImage: "doc.on.doc")
+          }
+          Menu {
+            ForEach(boards) { board in
+              Button {
+                toggle(board)
+              } label: {
+                if palette.boards.contains(where: { $0.id == board.id }) {
+                  Label(board.name, systemImage: "checkmark")
+                } else {
+                  Text(board.name)
+                }
+              }
+            }
+            Button {
+              showingNewBoardPrompt = true
+            } label: {
+              Label("New Board...", systemImage: "plus")
+            }
+          } label: {
+            Label("Add to Board", systemImage: "rectangle.stack.badge.plus")
+          }
+          Button(role: .destructive) {
+            showingDeleteConfirmation = true
+          } label: {
+            Label("Delete", systemImage: "trash")
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
+        }
+      }
     }
     .task(id: palette.id) { shareImage = renderShareCard() }
+    .sensoryFeedback(.success, trigger: didCopy)
+    .confirmationDialog(
+      "Delete this palette? This can't be undone.",
+      isPresented: $showingDeleteConfirmation,
+      titleVisibility: .visible
+    ) {
+      Button("Delete", role: .destructive) {
+        modelContext.delete(palette)
+        dismiss()
+      }
+      Button("Cancel", role: .cancel) {}
+    }
+    .alert("New Board", isPresented: $showingNewBoardPrompt) {
+      TextField("Board name", text: $newBoardName)
+      Button("Cancel", role: .cancel) { newBoardName = "" }
+      Button("Create") {
+        let trimmed = newBoardName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty {
+          let board = Board(name: trimmed)
+          modelContext.insert(board)
+          palette.boards.append(board)
+        }
+        newBoardName = ""
+      }
+    }
+  }
+
+  private func toggle(_ board: Board) {
+    if let index = palette.boards.firstIndex(where: { $0.id == board.id }) {
+      palette.boards.remove(at: index)
+    } else {
+      palette.boards.append(board)
+    }
+  }
+
+  private func copyAllHexValues() {
+    UIPasteboard.general.string = colors.map { $0.hex.uppercased() }.joined(separator: "\n")
+    didCopy.toggle()
   }
 
   private var colorList: some View {
@@ -177,10 +259,14 @@ private struct ShareCard: View {
   }
   let colorsData = (try? JSONEncoder().encode(sampleColors)) ?? Data()
   let palette = Palette(name: "Sunset Dock", colorsData: colorsData, thumbnail: nil)
+  let container = try! ModelContainer(
+    for: Palette.self, Board.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+  container.mainContext.insert(palette)
 
   return NavigationStack {
     PaletteDetailView(palette: palette)
   }
+  .modelContainer(container)
 }
 
 #Preview("Share card") {
