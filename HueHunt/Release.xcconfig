@@ -1,7 +1,6 @@
-// Base configuration for Release builds. Assign this in Xcode: select the project file, the
-// Info tab, and set it as the "Based on Configuration File" for Release (per target or at the
-// project level, matching how Debug.xcconfig is assigned).
-#include? "Secrets.xcconfig"
+// Base configuration for Release builds, assigned via the project's Info tab > Configurations.
+// Secrets.xcconfig lives in ../Config, gitignored, copied from Secrets.xcconfig.example.
+#include? "../Config/Secrets.xcconfig"
 
 INFOPLIST_KEY_SUPABASE_URL = $(SUPABASE_URL)
 INFOPLIST_KEY_SUPABASE_ANON_KEY = $(SUPABASE_ANON_KEY)

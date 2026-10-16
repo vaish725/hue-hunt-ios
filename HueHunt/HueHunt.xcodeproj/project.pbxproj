@@ -7,17 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		91693D053082DC36002279C0 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 91693D043082DC36002279C0 /* Supabase */; };
 		91698A7D307D75F2001D4FFB /* PaletteEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 91698A7C307D75F2001D4FFB /* PaletteEngine */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* HueHunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueHunt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		91693CE63082C709002279C0 /* HueHunt.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = HueHunt.xcodeproj; sourceTree = "<group>"; };
+		91693CFC3082C76A002279C0 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		91693D003082C782002279C0 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		91698A8B307D82D9001D4FFB /* HueHunt.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = HueHunt.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		91693D023082C8BE002279C0 /* Exceptions for "HueHunt" folder in "HueHunt" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Debug.xcconfig,
+				Release.xcconfig,
+			);
+			target = 000000000000000100000000 /* HueHunt */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		000000000000000000000010 /* HueHunt */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				91693D023082C8BE002279C0 /* Exceptions for "HueHunt" folder in "HueHunt" target */,
+			);
 			name = HueHunt;
 			sourceTree = "<group>";
 		};
@@ -27,6 +45,7 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				91693D053082DC36002279C0 /* Supabase in Frameworks */,
 				91698A7D307D75F2001D4FFB /* PaletteEngine in Frameworks */,
 			);
 		};
@@ -38,6 +57,9 @@
 			children = (
 				000000000000000000000010 /* HueHunt */,
 				000000000000000000000020 /* Products */,
+				91693CC83082C709002279C0 /* Recovered References */,
+				91693CFC3082C76A002279C0 /* Debug.xcconfig */,
+				91693D003082C782002279C0 /* Release.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -46,6 +68,19 @@
 			children = (
 				000000000000000000000120 /* HueHunt.app */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		91693CC83082C709002279C0 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				91698A8B307D82D9001D4FFB /* HueHunt.xcodeproj */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		91693CE83082C709002279C0 /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -73,6 +108,7 @@
 			name = HueHunt;
 			packageProductDependencies = (
 				91698A7C307D75F2001D4FFB /* PaletteEngine */,
+				91693D043082DC36002279C0 /* Supabase */,
 			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* HueHunt.app */;
@@ -104,6 +140,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				91698A7B307D75F2001D4FFB /* XCLocalSwiftPackageReference "../Packages/PaletteEngine" */,
+				91693D033082DC36002279C0 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
@@ -112,6 +149,10 @@
 				{
 					ProductGroup = 91698A8D307D82D9001D4FFB /* Products */;
 					ProjectRef = 91698A8B307D82D9001D4FFB /* HueHunt.xcodeproj */;
+				},
+				{
+					ProductGroup = 91693CE83082C709002279C0 /* Products */;
+					ProjectRef = 91693CE63082C709002279C0 /* HueHunt.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -272,6 +313,7 @@
 		};
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "HueHunt" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91693CFC3082C76A002279C0 /* Debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -310,6 +352,7 @@
 		};
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "HueHunt" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91693D003082C782002279C0 /* Release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -374,7 +417,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		91693D033082DC36002279C0 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		91693D043082DC36002279C0 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91693D033082DC36002279C0 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
 		91698A7C307D75F2001D4FFB /* PaletteEngine */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PaletteEngine;

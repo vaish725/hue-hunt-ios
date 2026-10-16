@@ -18,7 +18,13 @@ final class AuthService {
   var isSignedIn: Bool { session != nil }
   var needsUsername: Bool { isSignedIn && username == nil }
 
-  init(client: SupabaseClient = .live) {
+  // No default for `client`: a default-value expression is type-checked in a nonisolated
+  // context even on a @MainActor type, so `= .live` here would warn under strict concurrency.
+  // Callers pass `.live` explicitly instead (see MyApp.swift).
+  //
+  // AuthService lives for the app's whole lifetime (held at the root view), so authStateTask is
+  // never explicitly cancelled, there's no shorter-lived owner to cancel it on behalf of.
+  init(client: SupabaseClient) {
     self.client = client
     authStateTask = Task { [weak self] in
       guard let self else { return }
@@ -26,10 +32,6 @@ final class AuthService {
         await self.handle(session: session)
       }
     }
-  }
-
-  deinit {
-    authStateTask?.cancel()
   }
 
   // Sends a 6-digit sign-in code to the given email. Supabase creates the user on first use.
@@ -46,7 +48,8 @@ final class AuthService {
   }
 
   func isUsernameAvailable(_ username: String) async throws -> Bool {
-    let response = try await client
+    let response =
+      try await client
       .from("profiles")
       .select("id", head: true, count: .exact)
       .eq("username", value: username)
@@ -73,7 +76,8 @@ final class AuthService {
   }
 
   private func fetchUsername(for userID: UUID) async throws -> String? {
-    let response: PostgrestResponse<[ProfileRow]> = try await client
+    let response: PostgrestResponse<[ProfileRow]> =
+      try await client
       .from("profiles")
       .select("username")
       .eq("id", value: userID)

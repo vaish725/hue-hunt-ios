@@ -169,5 +169,5 @@ struct AccountView: View {
   NavigationStack {
     AccountView()
   }
-  .environment(AuthService())
+  .environment(AuthService(client: .live))
 }
