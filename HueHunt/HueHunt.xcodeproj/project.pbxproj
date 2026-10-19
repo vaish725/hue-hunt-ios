@@ -13,6 +13,7 @@
 
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* HueHunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueHunt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		913675603085AD9D00F9C78B /* HueHunt.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = HueHunt.xcodeproj; sourceTree = "<group>"; };
 		91693CE63082C709002279C0 /* HueHunt.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = HueHunt.xcodeproj; sourceTree = "<group>"; };
 		91693CFC3082C76A002279C0 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		91693D003082C782002279C0 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
@@ -71,10 +72,16 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		913675633085AD9D00F9C78B /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		91693CC83082C709002279C0 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
 				91698A8B307D82D9001D4FFB /* HueHunt.xcodeproj */,
+				91693CE63082C709002279C0 /* HueHunt.xcodeproj */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -146,6 +153,10 @@
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = 913675633085AD9D00F9C78B /* Products */;
+					ProjectRef = 913675603085AD9D00F9C78B /* HueHunt.xcodeproj */;
+				},
 				{
 					ProductGroup = 91698A8D307D82D9001D4FFB /* Products */;
 					ProjectRef = 91698A8B307D82D9001D4FFB /* HueHunt.xcodeproj */;
@@ -345,7 +356,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
@@ -384,7 +395,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Release;

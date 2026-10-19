@@ -25,12 +25,15 @@ jobs:
       - name: Test PaletteEngine package
         run: swift test --package-path Packages/PaletteEngine
 
-      # Switches to `xcodebuild test` once a real HueHuntTests target exists.
+      # Release config so SWIFT_TREAT_WARNINGS_AS_ERRORS (set in Release.xcconfig) actually
+      # gates CI, per PRD 15.1. Switches to `xcodebuild test` once a real HueHuntTests target
+      # exists.
       - name: Build HueHunt app
         run: |
           xcodebuild build \
             -project HueHunt/HueHunt.xcodeproj \
             -scheme HueHunt \
+            -configuration Release \
             -destination 'generic/platform=iOS Simulator' \
             -resultBundlePath TestResults.xcresult
 

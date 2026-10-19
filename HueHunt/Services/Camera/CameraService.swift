@@ -11,18 +11,34 @@ struct PixelSample: Sendable {
 // Owns the AVCaptureSession and publishes downsampled frames as an async stream.
 // Session start/stop and the sample buffer delegate run on dedicated serial queues,
 // the one place GCD is used instead of Swift concurrency, since AVCaptureSession
-// needs a specific, stable queue rather than actor isolation.
-final class CameraService: NSObject, @unchecked Sendable {
+// needs a specific, stable queue rather than actor isolation. Explicitly `nonisolated`:
+// the project defaults new types to @MainActor, but this type's safety comes from manually
+// confining each mutable property to one specific queue, not from actor isolation, so it
+// must opt out of that default to keep its queue-dispatched closures nonisolated too.
+nonisolated final class CameraService: NSObject, @unchecked Sendable {
   private let session = AVCaptureSession()
   private let sessionQueue = DispatchQueue(label: "com.huehunt.camera.session")
   private let frameQueue = DispatchQueue(label: "com.huehunt.camera.frames")
   private let videoOutput = AVCaptureVideoDataOutput()
   private let minimumFrameInterval: TimeInterval = 0.2
-  private var lastFrameDate = Date.distantPast
-  private var latestPixelBuffer: CVPixelBuffer?
-  private var continuation: AsyncStream<PixelSample>.Continuation?
+  // Mutable state confined to frameQueue (or, for `continuation`, set once before streaming
+  // starts) rather than protected by actor isolation. `nonisolated(unsafe)` matches the
+  // `@unchecked Sendable` conformance above: the compiler can't verify this confinement, so it
+  // has to be asserted manually.
+  private nonisolated(unsafe) var lastFrameDate = Date.distantPast
+  private nonisolated(unsafe) var latestPixelBuffer: CVPixelBuffer?
+  private nonisolated(unsafe) var continuation: AsyncStream<PixelSample>.Continuation?
 
-  private(set) lazy var previewLayer = AVCaptureVideoPreviewLayer(session: session)
+  // Was `lazy var`; under `nonisolated`, lazy storage trips a circular diagnostic (`nonisolated`
+  // is rejected as inapplicable, `nonisolated(unsafe)` is flagged as having no effect). A plain
+  // `let` sidesteps it, set in `init` below since a default-value expression can't reference
+  // `self.session`.
+  let previewLayer: AVCaptureVideoPreviewLayer
+
+  override init() {
+    previewLayer = AVCaptureVideoPreviewLayer(session: session)
+    super.init()
+  }
 
   static var authorizationStatus: AVAuthorizationStatus {
     AVCaptureDevice.authorizationStatus(for: .video)
